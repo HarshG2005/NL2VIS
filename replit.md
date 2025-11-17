@@ -23,10 +23,16 @@ This project is configured to run in the Replit environment with:
   - Trend identification
   - Actionable recommendations
 - **Interactive Data Preview**: Sortable table with first 100 rows
-- **Tabbed Navigation**: Clean interface with three tabs on the analysis page:
+- **Tabbed Navigation**: Clean interface with four tabs on the analysis page:
   - **Insights & Recommendations**: View AI-generated insights and actionable recommendations
   - **Visualizations**: Browse all generated charts and graphs
   - **Data Preview**: Examine the uploaded data in table format
+  - **Data Chat**: Ask questions about your data in natural language
+- **Data Chat Feature**: Interactive chat interface powered by Gemini AI
+  - Ask questions in plain English (e.g., "What is the average price?", "How many rows have sales over 1000?")
+  - Get instant answers based on your uploaded data
+  - No SQL queries required - just natural conversation
+  - Requires GEMINI_API_KEY to be configured in Replit Secrets
 - **Professional UI**: Clean, modern design following Material Design principles with cyan-themed buttons
 
 ## Technology Stack

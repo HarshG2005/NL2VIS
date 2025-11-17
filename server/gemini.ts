@@ -129,6 +129,10 @@ export async function answerDataQuestion(
   parsedData: ParsedData,
   question: string
 ): Promise<string> {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY environment variable is not set. Please configure your API key in Replit Secrets.");
+  }
+
   try {
     const dataSummary = {
       columns: parsedData.columns,

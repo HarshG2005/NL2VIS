@@ -162,14 +162,19 @@ function DataChatInterface({ analysisId, parsedData }: { analysisId: string; par
         body: JSON.stringify({ question: userMessage }),
       });
 
-      if (!response.ok) throw new Error('Failed to get response');
-
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.details || data.error || 'Failed to get response');
+      }
+
       setMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || 'Sorry, I encountered an error processing your question. Please check that your Gemini API key is configured correctly.';
+      
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: 'Sorry, I encountered an error processing your question. Please try again.' 
+        content: errorMessage
       }]);
     } finally {
       setIsLoading(false);
