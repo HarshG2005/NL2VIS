@@ -1,3 +1,4 @@
+import React from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Download, FileText } from "lucide-react";
@@ -77,7 +78,7 @@ export default function AnalysisPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <Tabs defaultValue="insights" className="w-full">
-          <TabsList className="!grid !w-full !max-w-4xl !mx-auto !grid-cols-3 !h-auto !p-2 !bg-transparent !gap-4 mb-8 !flex-none">
+          <TabsList className="!grid !w-full !max-w-6xl !mx-auto !grid-cols-4 !h-auto !p-2 !bg-transparent !gap-4 mb-8 !flex-none">
             <TabsTrigger 
               value="insights" 
               className="!text-base !font-medium !py-4 !px-6 !rounded-lg !bg-cyan-500 !text-white !shadow-md hover:!bg-cyan-600 data-[state=active]:!bg-cyan-600 data-[state=active]:!shadow-lg data-[state=inactive]:!bg-cyan-500 data-[state=inactive]:!opacity-80"
@@ -95,6 +96,12 @@ export default function AnalysisPage() {
               className="!text-base !font-medium !py-4 !px-6 !rounded-lg !bg-cyan-500 !text-white !shadow-md hover:!bg-cyan-600 data-[state=active]:!bg-cyan-600 data-[state=active]:!shadow-lg data-[state=inactive]:!bg-cyan-500 data-[state=inactive]:!opacity-80"
             >
               Data Preview
+            </TabsTrigger>
+            <TabsTrigger 
+              value="chat" 
+              className="!text-base !font-medium !py-4 !px-6 !rounded-lg !bg-cyan-500 !text-white !shadow-md hover:!bg-cyan-600 data-[state=active]:!bg-cyan-600 data-[state=active]:!shadow-lg data-[state=inactive]:!bg-cyan-500 data-[state=inactive]:!opacity-80"
+            >
+              Data Chat
             </TabsTrigger>
           </TabsList>
 
@@ -125,7 +132,106 @@ export default function AnalysisPage() {
               <DataTable data={parsedData} />
             </div>
           </TabsContent>
+
+          <TabsContent value="chat" className="mt-0">
+            <DataChatInterface analysisId={id!} parsedData={parsedData} />
+          </TabsContent>
         </Tabs>
+      </div>
+    </div>
+  );
+}
+
+function DataChatInterface({ analysisId, parsedData }: { analysisId: string; parsedData: any }) {
+  const [messages, setMessages] = React.useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
+  const [input, setInput] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const handleSendMessage = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = input.trim();
+    setInput('');
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`/api/data-chat/${analysisId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: userMessage }),
+      });
+
+      if (!response.ok) throw new Error('Failed to get response');
+
+      const data = await response.json();
+      setMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
+    } catch (error) {
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'Sorry, I encountered an error processing your question. Please try again.' 
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <h2 className="text-2xl font-semibold mb-6">Data Chat</h2>
+      <div className="bg-card rounded-lg border shadow-sm">
+        <div className="h-[500px] overflow-y-auto p-6 space-y-4">
+          {messages.length === 0 ? (
+            <div className="text-center text-muted-foreground py-12">
+              <p className="text-lg mb-4">Ask questions about your data in natural language!</p>
+              <div className="text-sm space-y-2">
+                <p>Examples:</p>
+                <p className="text-cyan-600">• "How many rows have sales greater than 1000?"</p>
+                <p className="text-cyan-600">• "What is the average price?"</p>
+                <p className="text-cyan-600">• "Show me the top 5 products by revenue"</p>
+              </div>
+            </div>
+          ) : (
+            messages.map((msg, idx) => (
+              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[80%] rounded-lg p-4 ${
+                  msg.role === 'user' 
+                    ? 'bg-cyan-500 text-white' 
+                    : 'bg-muted'
+                }`}>
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                </div>
+              </div>
+            ))
+          )}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-muted rounded-lg p-4">
+                <p className="text-muted-foreground">Thinking...</p>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="border-t p-4">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              placeholder="Ask a question about your data..."
+              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              disabled={isLoading}
+            />
+            <Button 
+              onClick={handleSendMessage} 
+              disabled={!input.trim() || isLoading}
+              className="bg-cyan-500 hover:bg-cyan-600"
+            >
+              Send
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

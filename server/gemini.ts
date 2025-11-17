@@ -124,3 +124,49 @@ Focus on:
     };
   }
 }
+
+export async function answerDataQuestion(
+  parsedData: ParsedData,
+  question: string
+): Promise<string> {
+  try {
+    const dataSummary = {
+      columns: parsedData.columns,
+      columnTypes: parsedData.columnTypes,
+      rowCount: parsedData.rows.length,
+      sampleRows: parsedData.rows.slice(0, 20),
+    };
+
+    const prompt = `You are a data analysis assistant. Answer the following question about the dataset using ONLY the information provided.
+
+Dataset Information:
+- Total Rows: ${dataSummary.rowCount}
+- Columns: ${dataSummary.columns.join(", ")}
+- Column Types: ${JSON.stringify(dataSummary.columnTypes, null, 2)}
+
+Sample Data (first 20 rows):
+${JSON.stringify(dataSummary.sampleRows, null, 2)}
+
+User Question: ${question}
+
+Instructions:
+1. Analyze the data carefully
+2. Provide a clear, concise answer based ONLY on the data shown
+3. If you need to calculate something (sum, average, count, etc.), do the calculation
+4. If the question cannot be answered with the available data, explain what data would be needed
+5. Format your response in a clear, easy-to-read way
+6. Include specific numbers and examples from the data when relevant
+
+Answer the question directly and helpfully:`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
+
+    return response.text || "I couldn't generate an answer. Please try rephrasing your question.";
+  } catch (error) {
+    console.error("Data chat error:", error);
+    return "Sorry, I encountered an error processing your question. Please try again with a different question.";
+  }
+}

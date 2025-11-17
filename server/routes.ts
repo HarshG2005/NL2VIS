@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import multer from "multer";
 import { storage } from "./storage";
 import { parseCSV, parseExcel, parseJSON, generateVisualizations } from "./parsers";
-import { analyzeDataWithAI } from "./gemini";
+import { analyzeDataWithAI, answerDataQuestion } from "./gemini";
 import type { AnalysisResult, DataFile } from "@shared/schema";
 
 // Configure multer for file uploads
@@ -124,6 +124,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Get analysis error:", error);
       res.status(500).json({ 
         error: "Failed to retrieve analysis",
+        details: error.message 
+      });
+    }
+  });
+
+  // Data chat endpoint - natural language queries
+  app.post("/api/data-chat/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { question } = req.body;
+
+      if (!question || typeof question !== "string") {
+        return res.status(400).json({ error: "Question is required" });
+      }
+
+      const analysis = await storage.getAnalysis(id);
+      if (!analysis) {
+        return res.status(404).json({ error: "Analysis not found" });
+      }
+
+      const answer = await answerDataQuestion(analysis.parsedData, question);
+      res.json({ answer });
+    } catch (error: any) {
+      console.error("Data chat error:", error);
+      res.status(500).json({ 
+        error: "Failed to process question",
         details: error.message 
       });
     }
