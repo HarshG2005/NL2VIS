@@ -3,7 +3,15 @@
 ## Overview
 DataViz AI is an intelligent data analysis and visualization platform that automatically processes uploaded files, generates appropriate visualizations, and uses Gemini AI to create narrative summaries and insights.
 
-**Last Updated:** November 11, 2025
+**Last Updated:** November 17, 2025
+
+## Replit Setup
+
+This project is configured to run in the Replit environment with:
+- **Development Server**: Runs on port 5000 (combines Express backend + Vite frontend)
+- **Workflow**: "DataViz AI" runs `npm run dev` automatically
+- **Deployment**: Configured for autoscale deployment with `npm run build` and `npm start`
+- **Dependencies**: All npm packages installed and ready to use
 
 ## Features
 - **Multi-Format Support**: Upload CSV, Excel (XLSX/XLS), or JSON files
