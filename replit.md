@@ -23,7 +23,11 @@ This project is configured to run in the Replit environment with:
   - Trend identification
   - Actionable recommendations
 - **Interactive Data Preview**: Sortable table with first 100 rows
-- **Professional UI**: Clean, modern design following Material Design principles
+- **Tabbed Navigation**: Clean interface with three tabs on the analysis page:
+  - **Insights & Recommendations**: View AI-generated insights and actionable recommendations
+  - **Visualizations**: Browse all generated charts and graphs
+  - **Data Preview**: Examine the uploaded data in table format
+- **Professional UI**: Clean, modern design following Material Design principles with cyan-themed buttons
 
 ## Technology Stack
 
