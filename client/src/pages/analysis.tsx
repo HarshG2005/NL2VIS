@@ -4,6 +4,7 @@ import { ArrowLeft, Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AIInsightsPanel } from "@/components/ai-insights-panel";
 import { DataTable } from "@/components/data-table";
 import { VisualizationCard } from "@/components/visualization-card";
@@ -74,31 +75,57 @@ export default function AnalysisPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-        {/* AI Insights */}
-        <AIInsightsPanel insights={aiInsights} />
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <Tabs defaultValue="insights" className="w-full">
+          <TabsList className="!grid !w-full !max-w-4xl !mx-auto !grid-cols-3 !h-auto !p-2 !bg-transparent !gap-4 mb-8 !flex-none">
+            <TabsTrigger 
+              value="insights" 
+              className="!text-base !font-medium !py-4 !px-6 !rounded-lg !bg-cyan-500 !text-white !shadow-md hover:!bg-cyan-600 data-[state=active]:!bg-cyan-600 data-[state=active]:!shadow-lg data-[state=inactive]:!bg-cyan-500 data-[state=inactive]:!opacity-80"
+            >
+              Insights & Recommendations
+            </TabsTrigger>
+            <TabsTrigger 
+              value="visualizations" 
+              className="!text-base !font-medium !py-4 !px-6 !rounded-lg !bg-cyan-500 !text-white !shadow-md hover:!bg-cyan-600 data-[state=active]:!bg-cyan-600 data-[state=active]:!shadow-lg data-[state=inactive]:!bg-cyan-500 data-[state=inactive]:!opacity-80"
+            >
+              Visualizations
+            </TabsTrigger>
+            <TabsTrigger 
+              value="data" 
+              className="!text-base !font-medium !py-4 !px-6 !rounded-lg !bg-cyan-500 !text-white !shadow-md hover:!bg-cyan-600 data-[state=active]:!bg-cyan-600 data-[state=active]:!shadow-lg data-[state=inactive]:!bg-cyan-500 data-[state=inactive]:!opacity-80"
+            >
+              Data Preview
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Visualizations Grid */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-6">Visualizations</h2>
-          {visualizations.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {visualizations.map((viz) => (
-                <VisualizationCard key={viz.id} visualization={viz} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>No visualizations available for this data.</p>
-            </div>
-          )}
-        </div>
+          <TabsContent value="insights" className="mt-0">
+            <AIInsightsPanel insights={aiInsights} />
+          </TabsContent>
 
-        {/* Data Table */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-6">Data Preview</h2>
-          <DataTable data={parsedData} />
-        </div>
+          <TabsContent value="visualizations" className="mt-0">
+            <div>
+              <h2 className="text-2xl font-semibold mb-6">Visualizations</h2>
+              {visualizations.length > 0 ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {visualizations.map((viz) => (
+                    <VisualizationCard key={viz.id} visualization={viz} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>No visualizations available for this data.</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="data" className="mt-0">
+            <div>
+              <h2 className="text-2xl font-semibold mb-6">Data Preview</h2>
+              <DataTable data={parsedData} />
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
